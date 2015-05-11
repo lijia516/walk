@@ -35,7 +35,7 @@ enum RobotArmControls
 {
     
     PELVIS_R=0, LTHIGH_RX, LTHIGH_RY,LTHIGH_RZ, RTHIGH_RX, RTHIGH_RY, RTHIGH_RZ, LSHIN_RX, RSHIN_RX, LFOOT_RX, LFOOT_RY, LFOOT_RZ, RFOOT_RX, RFOOT_RY, RFOOT_RZ, SPINE_RX, SPINE_RY, SPINE_RZ, HEAD_RX, HEAD_RY, HEAD_RZ, LSCAPULA_RX, LSCAPULA_RY, LSCAPULA_RZ, RSCAPULA_RX, RSCAPULA_RY, RSCAPULA_RZ, RFOREARM_RX, RFOREARM_RY, RFOREARM_RZ, LFOREARM_RX, LFOREARM_RY, LFOREARM_RZ, LHAND_RX, LHAND_RY, LHAND_RZ, RHAND_RX, RHAND_RY, RHAND_RZ, THIGH_EXLEN,
-        LBICEP_EXLEN, RBICEP_EXLEN, TWIST, PELVIS_ExZ,
+        LBICEP_EXLEN, RBICEP_EXLEN, TWIST, PELVIS_ExZ,ROPE,
     
     PARTICLE_COUNT, NUMCONTROLS,
     LTHIGH_H, RTHIGH_H, LSHIN_H, RSHIN_H,
@@ -71,6 +71,8 @@ public:
     Human(int x, int y, int w, int h, char *label)
         : ModelerView(x,y,w,h,label) {}
     virtual void draw();
+	Vec3f ropeStart = Vec3f(-4,4,4);
+	Vec3f ropeEnd;
 };
 
 // We need to make a creator function, mostly because of
@@ -102,6 +104,20 @@ Mat4f glGetMatrix(GLenum pname)
 
 
 
+void volcano()
+{
+
+
+	setDiffuseColor( 139/255.0, 69/255.0,19/255.0);
+	setAmbientColor( 1, 1, 1);
+	setSpecularColor(0,0,0);
+
+		glPushMatrix();
+		glTranslatef(-4,0,+4);
+		glRotatef(-90,1,0,0);
+		drawCylinder(4, 3, 1);
+		glPopMatrix();
+}
 
 
 // We are going to override (is that the right word?) the draw()
@@ -172,6 +188,7 @@ void Human::draw()
     float rbicep_len = VAL(RBICEP_EXLEN);
     
     float twist = VAL(TWIST);
+	float rope = VAL(ROPE);
     
 
     // This call takes care of a lot of the nasty projection 
@@ -189,6 +206,51 @@ void Human::draw()
 
 	static GLfloat lmodel_ambient[] = {0.4,0.4,0.4,1.0};
     
+    //draw volcano
+	volcano();
+
+	//rope
+	setDiffuseColor( 0.3, 0.5, 0.2 );
+	setAmbientColor( 0.4, 0.4, 0.4 );
+	setSpecularColor(0,0,0);
+	glPushMatrix();
+	glTranslatef(ropeStart[0], ropeStart[1], ropeStart[2]);
+
+	setDiffuseColor( 139/255.0, 69/255.0,19/255.0);
+	setAmbientColor( 1, 1, 1);
+	setSpecularColor(0,0,0);
+
+	glRotatef(135,0,1,0);
+
+	drawCylinder(1, 0.1, 0.1);
+
+	glTranslatef(0,0,1);
+	glRotatef(56,1,0,0);
+	drawCylinder(rope, 0.1, 0.1);
+
+	glTranslatef(0,0,rope);
+
+	glPushMatrix();
+	setDiffuseColor( 1.0, 0.3, 0.0 );
+	setAmbientColor( 1.0, 1.0, 1.0 );
+	setSpecularColor(1.0,0.3,0);
+	glScalef(0.3,0.3,0.3);
+	y_box(0.25);
+	glPopMatrix();
+
+	glPopMatrix();
+
+	
+    glPushMatrix();
+    glTranslated(0, 0, 0);
+    drawSphere(0.5);
+    glPopMatrix();
+    
+    
+    glPushMatrix();
+    glTranslated(-1, 4, 0);
+    drawSphere(0.1);
+    glPopMatrix();
     
     
     glPushMatrix();
@@ -409,6 +471,8 @@ void Human::draw()
     
 
     
+		ParticleSystem *ps = ModelerApplication::Instance()->GetParticleSystem();
+		ps->ss.draw_fluid();
     
   //  std::cout<<"ori:" << ParticleSystem::particleOrigin[0] << "," << ParticleSystem::particleOrigin[1] << "," << ParticleSystem::particleOrigin[2] << std::endl;
 
@@ -755,14 +819,15 @@ int main()
     controls[PARTICLE_COUNT] = ModelerControl("particle count (pc)", 0.0, 5.0, 0.1, 5.0 );
     
     controls[TWIST] = ModelerControl("human twist", -360, 360, 0.1, 0 );
+    controls[ROPE] = ModelerControl("ROPE", 0, 5, 0.1, 2);
     
 
 	// You should create a ParticleSystem object ps here and then
 	// call ModelerApplication::Instance()->SetParticleSystem(ps)
 	// to hook it up to the animator interface.
 
-  //  ParticleSystem *ps = new ParticleSystem();
-  //  ModelerApplication::Instance()->SetParticleSystem(ps);
+	ParticleSystem *ps = new ParticleSystem();
+    ModelerApplication::Instance()->SetParticleSystem(ps);
     
     
     ModelerApplication::Instance()->Init(&createHuman, controls, NUMCONTROLS);

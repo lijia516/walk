@@ -10,6 +10,13 @@
 #include <vector>
 #include <map>
 
+#define IX(i,j,k) ((i)*(N+2)*(N+2)+(j)*(N+2)+(k))
+#define SWAP(a,b,tmp) {tmp = a; a = b; b = tmp;}
+#define FOR_EACH_GRID(N,i,j,k)	\
+		for(i = 1; i <= N; i++)	\
+for(j = 1; j <= N; j++) 	\
+for(k = 1; k <= N; k++)
+
 #include <FL/gl.h>
 
 using namespace std;
@@ -210,6 +217,16 @@ void ParticleSystem::computeForcesAndUpdateParticles(float t)
 	// TODO
     
    //  std::cout <<"time: " << t << std::endl;
+		// TODO
+		if(t- prevT > 0.03){
+				float deltaT = t - prevT;
+				ss.update_fluid(deltaT);
+				es.update(deltaT);
+				if( t - prevT > .04 )
+						printf("(!!) Dropped Frame %lf (!!)\n", t-prevT);
+				prevT = t;
+		}
+		return;
     
     if (isSimulate()) {
         
@@ -341,6 +358,8 @@ void ParticleSystem::computeForcesAndUpdateParticles(float t)
 void ParticleSystem::drawParticles(float t)
 {
 	// TODO
+		es.draw();
+		return;
     
     
     // state update
@@ -357,7 +376,6 @@ void ParticleSystem::drawParticles(float t)
                      
                      if ((*i) -> position[1] < 0 || (*i) -> position[0] > 5 || (*i) -> position[1] > 10) {
                          
-                         particles_pipe.erase(i);
                          
                      }
              }
@@ -370,7 +388,6 @@ void ParticleSystem::drawParticles(float t)
                  
                  if ((*i) -> position[1] < 0) {
                      
-                     particles.erase(i);
                      particleReal--;
                  }
              }
@@ -1039,4 +1056,563 @@ void ParticleSystem::pipe_computeForcesAndUpdateParticles(float t){
             (*i)->position[2] += (*i)->velocity[2] * deltaT;
         }
     }
+}
+
+void FluidSystem::draw_fluid(void){
+		int i, j,k;
+		double x, y , z, h;
+		double d[8];
+
+		h = 5.0f/N;
+		glDisable(GL_LIGHTING);
+		glPushMatrix();
+
+		glTranslatef(position[0] - 7.5,position[1]-0.5 -5.0/2, position[2] - 2.5);
+			cout<< position<<endl;
+
+		glBegin ( GL_QUADS );
+
+		for ( i=1 ; i<N-1 ; i++ ) {
+				x = (i-0.5f)*h;
+				for ( j=1 ; j<N-1 ; j++ ) {
+						y = (j-0.5f)*h;
+						for(k = 1; k < N-1; k++){
+								z = (k -0.5f)*h;
+								d[0] = dens[IX(i,j,k)];
+								d[1] = dens[IX(i,j,k-1)];
+								d[2] = dens[IX(i,j+1,k-1)];
+								d[3] = dens[IX(i,j+1,k)];
+								d[4] = dens[IX(i-1,j,k)];
+								d[5] = dens[IX(i-1,j,k-1)];
+								d[6] = dens[IX(i-1,j+1,k-1)];
+								d[7] = dens[IX(i-1,j+1,k)];
+								int t;
+								float opa = 0.2;
+								for(t=0;t<8;t++)
+										if(d[t] > 0.05){
+												break;
+										}
+								if(t >= 8)
+										continue;
+								//	d000 = dens[IX(i,j)];
+								//	d001 = dens[IX(i,j+1)];
+								//	d0 = dens[IX(i+1,j)];
+								//	d11 = dens[IX(i+1,j+1)];
+								//	if(d00 < 0.05 && d01 < 0.05 && d10 < 0.05 && d11 < 0.05)
+								//			continue;
+								//	d00 = 1.0;
+								//	d01 = 1.0;
+								//	d11 = 1.0;
+								//	d10 = 1.0;
+								//glColor4f ( d00, d00, d00 ); glVertex3f ( x, y ,0);
+								//glColor4f ( d10, d10, d10 ); glVertex3f ( x+h, y ,0);
+								//glColor4f ( d11, d11, d11 ); glVertex3f ( x+h, y+h ,0);
+								//glColor4f ( d01, d01, d01 ); glVertex3f ( x, y+h ,0);
+								glNormal3d( 1.0 ,0.0, 0.0);			// +x side
+								glColor4f(d[0],d[0],d[0],d[0]>opa?opa:d[0]);
+								glVertex3d( x, y, z);
+								glColor4f(d[1],d[1],d[1],d[1]>opa?opa:d[1]);
+								glVertex3d( x, y, z-h);
+								glColor4f(d[2],d[2],d[2],d[2]>opa?opa:d[2]);
+								glVertex3d( x,  y+h,z-h);
+								glColor4f(d[3],d[3],d[3],d[3]>opa?opa:d[3]);
+								glVertex3d( x,  y+h, z);
+
+								glNormal3d( 0.0 ,0.0, -1.0);		// -z side
+								glColor4f(d[1],d[1],d[1],d[1]>opa?opa:d[1]);
+								glVertex3d( x, y, z-h);
+								glColor4f(d[5],d[5],d[5],d[5]>opa?opa:d[5]);
+								glVertex3d( x-h,y,z-h);
+								glColor4f(d[6],d[6],d[6],d[6]>opa?opa:d[6]);
+								glVertex3d( x-h,  y+h,z-h);
+								glColor4f(d[2],d[2],d[2],d[2]>opa?opa:d[2]);
+								glVertex3d( x,  y+h,z-h);
+
+								glNormal3d(-1.0, 0.0, 0.0);			// -x side
+								glColor4f(d[5],d[5],d[5],d[5]>opa?opa:d[5]);
+								glVertex3d(x-h,y,z-h);
+								glColor4f(d[4],d[4],d[4],d[4]>opa?opa:d[4]);
+								glVertex3d(x-h,y, z);
+								glColor4f(d[7],d[7],d[7],d[7]>opa?opa:d[7]);
+								glVertex3d(x-h, y+h , z);
+								glColor4f(d[6],d[6],d[6],d[6]>opa?opa:d[6]);
+								glVertex3d(x-h, y+h,z-h);
+
+								glNormal3d( 0.0, 0.0, 1.0);			// +z side
+								glColor4f(d[4],d[4],d[4],d[4]>opa?opa:d[4]);
+								glVertex3d(x-h,y, z);
+								glColor4f(d[0],d[0],d[0],d[0]>opa?opa:d[0]);
+								glVertex3d( x,y, z);
+								glColor4f(d[3],d[3],d[3],d[3]>opa?opa:d[3]);
+								glVertex3d( x,  y+h, z);
+								glColor4f(d[7],d[7],d[7],d[7]>opa?opa:d[7]);
+								glVertex3d(x-h,  y+h, z);
+
+								glNormal3d( 0.0, 1.0, 0.0);			// top (+y)
+								glColor4f(d[3],d[3],d[3],d[3]>opa?opa:d[3]);
+								glVertex3d( x, y+ h, z);
+								glColor4f(d[2],d[2],d[2],d[2]>opa?opa:d[2]);
+								glVertex3d( x, y+ h,z-h);
+								glColor4f(d[6],d[6],d[6],d[6]>opa?opa:d[6]);
+								glVertex3d(x-h, y+ h,z-h);
+								glColor4f(d[7],d[7],d[7],d[7]>opa?opa:d[7]);
+								glVertex3d(x-h, y+ h, z);
+
+								glNormal3d( 0.0,-1.0, 0.0);			// bottom (-y)
+								glColor4f(d[0],d[0],d[0],d[0]>opa?opa:d[0]);
+								glVertex3d( x,y, z);
+								glColor4f(d[4],d[4],d[4],d[4]>opa?opa:d[4]);
+								glVertex3d(x-h,y, z);
+								glColor4f(d[5],d[5],d[5],d[5]>opa?opa:d[5]);
+								glVertex3d(x-h,y,z-h);
+								glColor4f(d[1],d[1],d[1],d[1]>opa?opa:d[1]);
+								glVertex3d( x,y,z-h);
+						}
+				}
+		}
+
+		glEnd ();
+		glPopMatrix();
+		glEnable(GL_LIGHTING);
+}
+
+
+void FluidSystem::add_to_array(double* x, int index, double quantity)
+{
+		x[index] += quantity;
+}
+
+void FluidSystem::gs_solver(int N, double* x, double *x0, double rate, double div)
+{
+		int i,j,k,iter;
+		for(iter = 0; iter < iteration_count; iter++){
+				FOR_EACH_GRID(N,i,j,k)
+				{
+						x[IX(i,j,k)] = (x0[IX(i,j,k)] +
+										rate * (x[IX(i-1,j,k)] + x[IX(i+1,j,k)] +
+												x[IX(i,j-1,k)] + x[IX(i,j+1,k)] +
+												x[IX(i,j,k-1)] + x[IX(i,j,k+1)]
+											   )
+									   )/div;
+				}
+
+		}
+}
+
+void FluidSystem::project(int N, double *u, double *v, double *w, double *g, double *g0)
+{
+		int i,j,k;
+		FOR_EACH_GRID(N,i,j,k)
+		{
+				g0[IX(i,j,k)]= -1.0/3.0 * (u[IX(i+1,j,k)] - u[IX(i-1,j,k)] +
+								v[IX(i,j+1,k)] - v[IX(i,j-1,k)] +
+								w[IX(i,j,k+1)] - w[IX(i,j,k-1)])/N;
+				g[IX(i,j,k)] = 0;
+		}
+		/*
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
+
+		   cout << "g0" << i << "," << j << "," << k <<":"<< g0[IX(i,j,k)] << ";";
+		   }
+		   cout << endl;
+		 */
+		//use gs_solver to iteratively compute gradient
+		gs_solver(N, g, g0, 1, 6);
+		/*
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
+
+		   cout << "g" << i << "," << j << "," << k <<":"<< g[IX(i,j,k)] << ";";
+		   }
+		   cout << endl;
+		 */
+		FOR_EACH_GRID(N,i,j,k)
+		{
+				u[IX(i,j,k)] -= 0.5 * N * (g[IX(i+1,j,k)] - g[IX(i-1,j,k)]);
+				v[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j+1,k)] - g[IX(i,j-1,k)]);
+				w[IX(i,j,k)] -= 0.5 * N * (g[IX(i,j,k+1)] - g[IX(i,j,k-1)]);
+		}
+}
+
+//back trace
+void FluidSystem::advect(int N, double *d, double *d0, double *u, double *v, double *w, double dt)
+{
+		int i,j,k;
+		double x,y,z;
+		int xi,yi,zi;
+		double xw, yw, zw;
+		double xwn, ywn, zwn;
+		//backward trace
+
+		//dt = dt * N;
+		//dt = 1;
+		dt = dt * N;
+		//	cout << dt <<endl;
+		FOR_EACH_GRID(N,i,j,k)
+		{
+				//which grid?
+				x = i - dt*u[IX(i,j,k)];
+				y = j - dt*v[IX(i,j,k)];
+				z = k - dt*w[IX(i,j,k)];
+				//warp test
+
+				//interpolate
+				if(x <= 0 || y <= 0 || z <= 0 || x >= N || y >= N || z >= N){//outside the grid
+						d[IX(i,j,k)] = 0.0;
+						continue;
+				}
+				//		printf("%d %d %d\n", i,j,k);
+				//		printf("%f\n", w[IX(i,j,k)]);
+				//		printf("%f %f %f\n", x,y, z);
+				xi = (int)x; yi = (int)y; zi = (int)z;
+				xwn = x - xi; ywn = y - yi; zwn = z - zi;
+				xw = 1.0 - xwn; yw = 1.0 - ywn;	zw = 1.0 - zwn;
+
+				//		printf("%d %d %d\n", xi,yi, zi);
+				d[IX(i,j,k)] =	xw * yw * zw * d0[IX(xi,yi,zi)] +
+						xwn * yw * zw * d0[IX(xi+1,yi,zi)] +
+						xw * ywn * zw * d0[IX(xi,yi+1,zi)] +
+						xwn * ywn * zw * d0[IX(xi+1,yi+1,zi)] +
+						xw * yw * zwn * d0[IX(xi,yi,zi+1)] +
+						xwn * yw * zwn * d0[IX(xi+1,yi,zi+1)] +
+						xw * ywn * zwn * d0[IX(xi,yi+1,zi+1)] +
+						xwn * ywn * zwn * d0[IX(xi+1,yi+1,zi+1)];
+				//			cout<<xwn <<","<< ywn  <<","<<zwn <<","<< d0[IX(xi+1,yi+1,zi+1)]<< endl;
+				//		printf("%f\n\n",d[IX(i,j,k)]);
+		}
+
+		/*
+		//extend world
+		xi = (int)x; yi = (int)y; zi = (int)z;
+		xi = xi < 1 ? 1 : xi > N? N: xi;
+		xi = xi < 1 ? 1 : xi > N? N: xi;
+		yi = yi < 1 ? 1 : yi > N? N: yi;
+		zi = zi < 1 ? 1 : zi > N? N: zi;
+		xwn = x - xi; ywn = y - yi; zwn = z - zi;
+		xwn = (xwn > 1.0)||(xwn < 0.0) ? 0.0 : xwn;
+		ywn = (ywn > 1.0)||(ywn < 0.0) ? 0.0 : ywn;
+		zwn = (zwn > 1.0)||(zwn < 0.0) ? 0.0 : zwn;
+		xw = 1.0 - xwn; yw = 1.0 - ywn;	zw = 1.0 - zwn;
+
+		d[IX(i,j,k)] =	xw * yw * zw * d0[IX(xi,yi,zi)] +
+		xwn * yw * zw * d0[IX(xi+1,yi,zi)] +
+		xw * ywn * zw * d0[IX(xi,yi+1,zi)] +
+		xwn * ywn * zw * d0[IX(xi+1,yi+1,zi)] +
+		xw * yw * zwn * d0[IX(xi,yi,zi+1)] +
+		xwn * yw * zwn * d0[IX(xi+1,yi,zi+1)] +
+		xw * ywn * zwn * d0[IX(xi,yi+1,zi+1)] +
+		xwn * ywn * zwn * d0[IX(xi+1,yi+1,zi+1)];
+		}
+		 */
+}
+void FluidSystem::diffuse(int N, double *d, double *d0, double rate)
+{
+		gs_solver(N, d, d0, rate, 1+6*rate);
+}
+void FluidSystem::dens_step(int N, double *d, double *d0, double *u, double *v, double *w, double dif, double dt)
+{
+		double *tmp;
+		int i,j,k;
+		SWAP(d0, d, tmp);
+		diffuse(N, d, d0, dif);
+		SWAP(d0, d, tmp);
+		advect(N, d, d0, u, v, w, dt);
+}
+void FluidSystem::vel_step(int N, double *u, double *v, double *w, double *u0, double *v0, double *w0, double vis, double dt)
+{
+		double *tmp;
+		int i,j,k;
+		SWAP(u, u0, tmp); SWAP(v, v0, tmp);	SWAP(w, w0, tmp);
+		diffuse(N, u, u0, vis);
+		diffuse(N, v, v0, vis);
+		diffuse(N, w, w0, vis);
+
+		project(N, u, v, w, u0, v0);
+		SWAP(u0, u, tmp);
+		SWAP(v0, v, tmp);
+		SWAP(w0, w, tmp);
+		//		cout << "!!!!" << w[IX(21,22,12)]<<endl;
+		advect(N, u, u0, u0, v0, w0, dt);
+		//	cout << "!!!!" <<endl;
+		advect(N, v, v0, u0, v0, w0, dt);
+		advect(N, w, w0, u0, v0, w0, dt);
+		/*
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
+		   if(u[IX(i,j,k)] != 0.0)
+		   cout << "u:"<<i << "," << j << "," << k <<":"<< u[IX(i,j,k)] << ";" <<endl;
+		   if(v[IX(i,j,k)] != 0.0)
+		   cout << "v:"<<i << "," << j << "," << k <<":"<< v[IX(i,j,k)] << ";" <<endl;
+		   if(w[IX(i,j,k)] != 0.0)
+		   cout << "w:"<<i << "," << j << "," << k <<":"<< w[IX(i,j,k)] << ";" <<endl;
+		   }
+		 */
+		project(N, u, v, w, u0, v0);
+		/*
+		   FOR_EACH_GRID(N,i,j,k)
+		   {
+		   if(u[IX(i,j,k)] > 0.1)
+		   cout << "u:"<<i << "," << j << "," << k <<":"<< u[IX(i,j,k)] << ";" <<endl;
+		   }
+		 */
+}
+
+void FluidSystem::update_fluid(double dt){
+		double *tmp;
+		int i,j,k;
+
+		//add fluid and pressure
+		add_to_array(dens, IX(N/2,1,N/2), 50.0);
+		add_to_array(			u,IX(N/2-1,1,N/2),20.0f);;
+		add_to_array(		u,IX(N/2-1,1,N/2-1),14.0f);;
+		add_to_array(	u,IX(N/2-1,1,N/2+1),14.0f);;
+
+		add_to_array(	u,IX(N/2+1,1,N/2),-20.0f);;
+		add_to_array(u,IX(N/2+1,1,N/2-1),-14.0f);;
+		add_to_array(u,IX(N/2+1,1,N/2+1),-14.0f);;
+
+		add_to_array(w,IX(N/2+1,1,N/2-1),14.0f);;
+		add_to_array(w,IX(N/2,1,N/2-1),20.0f);;
+		add_to_array(w,IX(N/2-1,1,N/2-1),14.0f);;
+
+		add_to_array(w,IX(N/2+1,1,N/2+1),-14.0f);;
+		add_to_array(w,IX(N/2,1,N/2+1),-20.0f);;
+		add_to_array(w,IX(N/2-1,1,N/2+1),-14.0f);
+
+		//disturbe
+		double positive;
+		double negative;
+		FOR_EACH_GRID(N,i,j,k){
+				positive = rand()/(double)(RAND_MAX) / 4;
+				negative = rand()/(double)(RAND_MAX+1) /4;
+				add_to_array(u, IX(i,j,k), positive +negative);
+				positive = rand()/(double)(RAND_MAX) / 4;
+				negative = rand()/(double)(RAND_MAX+1) /4;
+				add_to_array(v, IX(i,j,k), positive+negative);
+				positive = rand()/(double)(RAND_MAX)/4;
+				negative = rand()/(double)(RAND_MAX+1)/4;
+				add_to_array(w, IX(i,j,k), positive+negative);
+
+				//decay
+				if(dens[IX(i,j,k)] < 0.05){
+						dens[IX(i,j,k)] = 0;
+				}
+		}
+
+		vel_step ( N, u, v, w, u0, v0, w0, visc, dt);
+
+		//cout << "!!" <<endl;
+
+		//decay
+		/*
+		   FOR_EACH_GRID(N,i,j,k){
+		//	u[IX(i,j,k)] *= 0.99;
+		//	v[IX(i,j,k)] *= 0.99;
+		//	w[IX(i,j,k)] *= 0.99;
+		if(u[IX(i,j,k)] < 0.01){
+		u[IX(i,j,k)] = 0;
+		}
+		if(v[IX(i,j,k)] < 0.01){
+		v[IX(i,j,k)] = 0;
+		}
+		if(w[IX(i,j,k)] < 0.01){
+		w[IX(i,j,k)] = 0;
+		}
+		//disturb
+		if(dens[IX(i,j,k)] < 0.1){
+		dens[IX(i,j,k)] = 0;
+		}
+		}
+		 */
+		//	SWAP(dens, dens0,tmp);
+		dens_step (N, dens, dens0, u, v, w, diff, dt);
+
+		/*
+		   double test = 0;
+		//smoke decay
+		FOR_EACH_GRID(N,i,j,k)
+		{
+
+		if(dens[IX(i,j,k)] > 0.1){
+		cout << i << ","<< j << "," << k <<":"<< dens[IX(i,j,k)] << ";";
+		}
+		//	if(dens[IX(i,j,k)] < 0.01){
+		//			dens[IX(i,j,k)] = 0;
+		//	}
+		//	u[IX(i,j,k)] *= 0.8;
+		//	v[IX(i,j,k)] *= 0.8;
+		//	w[IX(i,j,k)] *= 0.8;
+		//	test+=(u[IX(i,j,k)]);
+		//	test+= (v[IX(i,j,k)]);
+		//	test+= (w[IX(i,j,k)]);
+		//test+= abs(u[IX(i,j,k)]);
+		//test+= abs(v[IX(i,j,k)]);
+		//test+= abs(w[IX(i,j,k)]);
+		test+= dens[IX(i,j,k)];
+
+		//	if(u[IX(i,j,k)] != 0.0){
+		//		cout << i << ","<< j << "," << k <<":"<< u[IX(i,j,k)] << ";";
+		//	}
+		//	if(v[IX(i,j,k)] != 0.0){
+		//			cout << i << ","<< j << "," << k <<":"<< v[IX(i,j,k)] << ";";
+		//	}
+		//	if(w[IX(i,j,k)] != 0.0){
+		//			cout << i << ","<< j << "," << k <<":"<< w[IX(i,j,k)] << ";";
+		//	}
+		}
+		cout << "Total:" << test << endl;
+		 */
+		//cout << u[IX(1,1,1)] << endl;
+}
+
+void ExplosionSystem::explode(Vec3f position){
+		for(std::vector<Particle>::iterator it = emitters.begin(); it != emitters.end();it++){
+				(*it).life = 4 + 2 * (rand() /(double)RAND_MAX);
+				(*it).position = position;
+				float x_r = -1 + 2 * (rand()/(double)RAND_MAX);
+				float y_r = 2 + (rand()/(double)RAND_MAX);
+				float z_r = -1 + 2 *( rand()/(double)RAND_MAX);
+				(*it).velocity = Vec3f(x_r, y_r ,z_r);
+				cout<< "V"<<(*it).velocity << endl;
+		}
+		start = true;
+}
+void ExplosionSystem::update(float dt){
+		if(!start)
+				explode(Vec3f(-4,4,4));
+		if(start){
+				for(std::vector<Particle>::iterator it = tails.begin(); it != tails.end();){
+						(*it).life -= (dt);
+						if(((*it).life) <= 0){
+								it = tails.erase(it);
+								continue;
+						}
+						it++;
+				}
+
+				for(std::vector<Particle>::iterator it = emitters.begin(); it != emitters.end();){
+						(*it).velocity[1] += a * (dt);
+						(*it).position = (*it).position + (*it).velocity * (dt);
+						//cout << (*it).position <<endl;
+						//cout << "dt"<<dt<<":"<< (*it).life;
+						(*it).life -= (dt);
+						(*it).counter += (dt);
+						if(((*it).life) <= 0){
+								it = emitters.erase(it);
+								continue;
+						}
+
+						//add tails
+						if((*it).counter >= 0.1){
+								(*it).counter = 0;
+								Particle ps;
+								ps.life = 1.0;
+								ps.position = (*it).position;
+								tails.push_back(ps);
+						}
+						it++;
+				}
+		}
+}
+void ExplosionSystem::draw(){
+		for(std::vector<Particle>::iterator it = emitters.begin(); it != emitters.end(); ++it){
+				glPushMatrix();
+				glTranslatef( (*it).position[0], (*it).position[1], (*it).position[2]);
+				//setAmbientColor( (*it).color[0], 0,0);
+				float temp = (*it).life / 6.5;
+				temp *= temp;
+				setDiffuseColor(0.75 +temp*0.2, 4+temp*0.3, 0.05+temp*0.1);
+				//setDiffuseColor(0.75, 0.3, 0.05);
+				setAmbientColor(1, 1, 1);
+				setSpecularColor(1,0,0);
+
+				glScalef(0.1,0.1,0.1);
+				glBegin( GL_QUADS );
+				glNormal3d( 1.0 ,0.0, 0.0);			// +x side
+				glVertex3d( 0.25,0.0, 0.25);
+				glVertex3d( 0.25,0.0,-0.25);
+				glVertex3d( 0.25,  2*0.25,-0.25);
+				glVertex3d( 0.25,  2*0.25, 0.25);
+
+				glNormal3d( 0.0 ,0.0, -1.0);		// -z side
+				glVertex3d( 0.25,0.0,-0.25);
+				glVertex3d(-0.25,0.0,-0.25);
+				glVertex3d(-0.25,  2*0.25,-0.25);
+				glVertex3d( 0.25,  2*0.25,-0.25);
+
+				glNormal3d(-1.0, 0.0, 0.0);			// -x side
+				glVertex3d(-0.25,0.0,-0.25);
+				glVertex3d(-0.25,0.0, 0.25);
+				glVertex3d(-0.25,  2*0.25, 0.25);
+				glVertex3d(-0.25,  2*0.25,-0.25);
+
+				glNormal3d( 0.0, 0.0, 1.0);			// +z side
+				glVertex3d(-0.25,0.0, 0.25);
+				glVertex3d( 0.25,0.0, 0.25);
+				glVertex3d( 0.25,  2*0.25, 0.25);
+				glVertex3d(-0.25,  2*0.25, 0.25);
+
+				glNormal3d( 0.0, 1.0, 0.0);			// top (+y)
+				glVertex3d( 0.25,  2*0.25, 0.25);
+				glVertex3d( 0.25,  2*0.25,-0.25);
+				glVertex3d(-0.25,  2*0.25,-0.25);
+				glVertex3d(-0.25,  2*0.25, 0.25);
+
+				glNormal3d( 0.0,-1.0, 0.0);			// bottom (-y)
+				glVertex3d( 0.25,0.0, 0.25);
+				glVertex3d(-0.25,0.0, 0.25);
+				glVertex3d(-0.25,0.0,-0.25);
+				glVertex3d( 0.25,0.0,-0.25);
+				glEnd();
+				glPopMatrix();
+		}
+
+		for(std::vector<Particle>::iterator it = tails.begin(); it != tails.end(); ++it){
+				glDisable(GL_LIGHTING);
+				glPushMatrix();
+				glTranslatef( (*it).position[0], (*it).position[1], (*it).position[2]);
+				glColor4f((*it).life,(*it).life,(*it).life,(*it).life);
+				//	glColor4f((*it).life,0,0,(*it).life);
+				glScalef(0.1*(*it).life,0.1*(*it).life,0.1*(*it).life);
+				glBegin( GL_QUADS );
+				glNormal3d( 1.0 ,0.0, 0.0);			// +x side
+				glVertex3d( 0.25,0.0, 0.25);
+				glVertex3d( 0.25,0.0,-0.25);
+				glVertex3d( 0.25,  2*0.25,-0.25);
+				glVertex3d( 0.25,  2*0.25, 0.25);
+
+				glNormal3d( 0.0 ,0.0, -1.0);		// -z side
+				glVertex3d( 0.25,0.0,-0.25);
+				glVertex3d(-0.25,0.0,-0.25);
+				glVertex3d(-0.25,  2*0.25,-0.25);
+				glVertex3d( 0.25,  2*0.25,-0.25);
+
+				glNormal3d(-1.0, 0.0, 0.0);			// -x side
+				glVertex3d(-0.25,0.0,-0.25);
+				glVertex3d(-0.25,0.0, 0.25);
+				glVertex3d(-0.25,  2*0.25, 0.25);
+				glVertex3d(-0.25,  2*0.25,-0.25);
+
+				glNormal3d( 0.0, 0.0, 1.0);			// +z side
+				glVertex3d(-0.25,0.0, 0.25);
+				glVertex3d( 0.25,0.0, 0.25);
+				glVertex3d( 0.25,  2*0.25, 0.25);
+				glVertex3d(-0.25,  2*0.25, 0.25);
+
+				glNormal3d( 0.0, 1.0, 0.0);			// top (+y)
+				glVertex3d( 0.25,  2*0.25, 0.25);
+				glVertex3d( 0.25,  2*0.25,-0.25);
+				glVertex3d(-0.25,  2*0.25,-0.25);
+				glVertex3d(-0.25,  2*0.25, 0.25);
+
+				glNormal3d( 0.0,-1.0, 0.0);			// bottom (-y)
+				glVertex3d( 0.25,0.0, 0.25);
+				glVertex3d(-0.25,0.0, 0.25);
+				glVertex3d(-0.25,0.0,-0.25);
+				glVertex3d( 0.25,0.0,-0.25);
+				glEnd();
+				glPopMatrix();
+				glEnable(GL_LIGHTING);
+		}
 }
