@@ -49,11 +49,23 @@ void IK::start(){
     std::cout <<"mRFootPostion:" << mRFootPosition(0) << "," << mRFootPosition(1) << "," << mRFootPosition(2) << "\n";
     
     
-    /*
+    float dt = 0.5;
     
     app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(0);
     
-    float dt = 0.5;
+    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(23);
+    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(22);
+    
+    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(32);
+    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(31);
+    
+    
+    app->GetUI()->m_pwndGraphWidget->AddCtrlPt(23, 0, 0);
+    app->GetUI()->m_pwndGraphWidget->AddCtrlPt(22, 0, 0);
+    
+    app->GetUI()->m_pwndGraphWidget->AddCtrlPt(32, 0, 0);
+    app->GetUI()->m_pwndGraphWidget->AddCtrlPt(31, 0, 0);
+    
     
     // check if need to rotate body
     
@@ -67,26 +79,32 @@ void IK::start(){
         app->GetUI()->m_pwndGraphWidget->AddCtrlPt(0, dt, angle * 180.0 / PI);
         
     }
-
-    */
     
     
     float distance = sqrt(pow(mGoalPostion(0) - mArmStartPostion(0), 2) + pow(mGoalPostion(1) - mArmStartPostion(1), 2) + pow(mGoalPostion(2) - mArmStartPostion(2), 2));
     
-    if ( true ) {//distance > 1.6) {
+    
+    cout << "distance" << distance<<" \n";
+    
+    if ( distance > 1.6) {
         
         cout << "need to walk \n";
         
         walk(app);
         
-        return;
     }
     
     
-    return;
+    mPelPostion(0) = 1.47049;
+    mPelPostion(1) = 2.45;
+    mPelPostion(2) = 0.0;
+    
+    updateArmPosition();
+    
+    updateCurPositionInitial();
     
     
-    /*
+    dt = 6.5;
     
     float dx;
     float dy;
@@ -100,11 +118,6 @@ void IK::start(){
     std::cout <<"dx, dy, dz:" << dx << "," << dy << "," << dz << "\n";
 
     
-    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(23);
-    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(22);
-    
-    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(32);
-    app->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(31);
     
     while (!getGoal() && dt < 19) {
         
@@ -130,10 +143,10 @@ void IK::start(){
         dz = dp (mGoalPostion(2), mFootPosition(2));
         
         std::cout <<"ls: angle1, angle2:" << mBodys[0]->mAngles[0] << "," << mBodys[0]->mAngles[1]<<"\n";
-     //   std::cout <<"lf: angle1, angle2:" << mBodys[1]->mAngles[0] << "," << mBodys[1]->mAngles[1]<<"\n";
+        std::cout <<"lf: angle1, angle2:" << mBodys[1]->mAngles[0] << "," << mBodys[1]->mAngles[1]<<"\n";
         
         
-    } */
+    }
 }
 
 
@@ -271,7 +284,7 @@ bool IK::getGoal() {
     std::cout <<"mCurPosition:" << mCurPosition(0) << "," << mCurPosition(1) << "," << mCurPosition(2) << "\n";
     
     
-    if (fabs(mCurPosition(0) - mGoalPostion(0)) <= 0.1f && fabs(mCurPosition(1) - mGoalPostion(1)) <= 0.1f && fabs(mCurPosition(2) - mGoalPostion(2)) <= 0.1f) {
+    if (fabs(mCurPosition(0) - mGoalPostion(0)) <= 0.5f && fabs(mCurPosition(1) - mGoalPostion(1)) <= 0.5f && fabs(mCurPosition(2) - mGoalPostion(2)) <= 0.5f) {
         
         std::cout << "true \n";
         
@@ -286,9 +299,11 @@ bool IK::getGoal() {
 float IK::rotateBody() {
     
     Vector3f directionGoal;
-    directionGoal(0) = mGoalPostion(0);
+    directionGoal(0) = mGoalPostion(0) - mOffset;
     directionGoal(1) = 0;
     directionGoal(2) = mGoalPostion(2);
+    
+     std::cout << "directionGoal: " << directionGoal <<"\n";
     
     float cosAngle = directionGoal.dot(headDirction);   // ignore |mGoalPosition| and |mCurposition| since we only want the sign of cosAngle
         
@@ -307,7 +322,7 @@ float IK::rotateBody() {
     
     std::cout << "directionNew1: " << directionNew <<"\n";
     
-    std::cout << "directionGoal: " << directionNew <<"\n";
+   
     
     float cosAngleNew = mGoalPostion.dot(directionNew);
     
@@ -355,9 +370,14 @@ void IK::updateArmPosition() {
     
     Vector2f newArmDir = rotateMatrix * newPelDir;
     
+    std::cout <<"new newArmDir:" << newArmDir(0) << "," << newArmDir(1) << "\n";
+    
     mArmStartPostion(0) = newArmDir(0) * 0.6 + mPelPostion(0);
     mArmStartPostion(1) = mPelPostion(1) + 1.2;
     mArmStartPostion(2) = newArmDir(1) * 0.6 + mPelPostion(2);
+    
+    std::cout <<"new mPelPostion:" << mPelPostion(0) << "," << mPelPostion(1) << "," << mPelPostion(2) << "\n";
+    
     
     std::cout <<"new mArmStartPostion:" << mArmStartPostion(0) << "," << mArmStartPostion(1) << "," << mArmStartPostion(2) << "\n";
     
@@ -449,7 +469,7 @@ void IK::walk(ModelerApplication* app) {
     app->GetUI()->m_pwndGraphWidget->AddCtrlPt(43,dt, 0);
     
     
-    while (dt < 10) {
+    while (dt < 6) {
         
         dt += 0.5;
         
@@ -517,8 +537,10 @@ void IK::walk(ModelerApplication* app) {
         mPelPostion(2) += temp;
         
         std::cout << "finish pel update"<< mPelPostion(2) << "\n";
-        
       
+        
+        if (dt > 6) break;
+        
       
         dt += 0.5;
         
@@ -565,8 +587,11 @@ void IK::walk(ModelerApplication* app) {
         
        
         
+        
         dt += 0.5;
         // left forward
+        
+        std::cout << "left forward dt: " << dt <<"\n";
         
         dydz(0) = dp_y;
         dydz(1) = dp_z;
@@ -581,10 +606,11 @@ void IK::walk(ModelerApplication* app) {
         mPelPostion(2) += temp;
         
         std::cout << "mple "<< mPelPostion(2) <<"\n";
-       
-     /**/
+     
         
     }
+    
+    cout << "dt: " << dt << endl;
     
 }
 
@@ -656,10 +682,7 @@ MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
 void IK::walk_calculateAngles(VectorXf dydz, float angle, std::string lr) {
     
     VectorXf walk_dAngles = VectorXf::Zero(mLegs.size() - 1, 1);
-    
-    
- 
-    
+
     walk_dAngles = walk_jacobianInverse(angle, lr) * dydz;
     
   

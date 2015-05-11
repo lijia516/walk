@@ -100,6 +100,7 @@ public:
     static Vec4f cloth_end;
     static Vec4f pelvisPosition;
     static Vec4f footPosition;
+    static float offset;
     
     float time;
     float time2;

@@ -425,9 +425,9 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
       //  myik->mBodys.push_back(rshin);
         
         
-        myik->mGoalPostion(0) = -1;
-        myik->mGoalPostion(1) = 5;
-        myik->mGoalPostion(2) = -1;
+        myik->mGoalPostion(0) = 0;
+        myik->mGoalPostion(1) = 4;
+        myik->mGoalPostion(2) = 0;
         
         myik->mCurPosition(0) = ParticleSystem::particleOrigin_pony[0];
         myik->mCurPosition(1) = ParticleSystem::particleOrigin_pony[1];
@@ -453,6 +453,8 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
         myik->mRFootPosition(1) = myik->mPelPostion(1) - 2.3 * cos(0.314);
         myik->mRFootPosition(2) = myik->mPelPostion(2) - 2.3 * sin(0.314);
         
+        myik->mOffset = ParticleSystem::offset;
+        
         myik->start();
         
     }
@@ -467,9 +469,6 @@ void ModelerUI::cb_addNewPt(Fl_Light_Button* o, void* v)
 {
     ((ModelerUI*)(o->user_data()))->cb_addNewPt_i(o,v);
 }
-
-
-
 
 
 inline void ModelerUI::cb_indicatorWnd_i(IndicatorWindow*, void*) 

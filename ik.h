@@ -48,6 +48,7 @@ public:
         mPelPostion = VectorXf::Zero(3, 1);
         mFootPosition = VectorXf::Zero(3, 1);
         mRFootPosition = VectorXf::Zero(3, 1);
+        mOffset = 0;
     
     };
     void start();
@@ -60,7 +61,7 @@ public:
     Vector3f headDirction;
     Vector3f mFootPosition;
     Vector3f mRFootPosition;
-
+    float mOffset;
     
     MatrixXf jacobianInverse(float angle);
     MatrixXf walk_jacobianInverse(float angle, std::string lr);

@@ -30,6 +30,8 @@ bool ParticleSystem::pony = false;
 bool ParticleSystem::cloth = false;
 bool ParticleSystem::bounceOff = false;
 
+float ParticleSystem::offset = 0;
+
 Vec4f ParticleSystem::particleOrigin_pony = Vec4f(0,0,0,1);
 Vec4f ParticleSystem::particleOrigin_cloth = Vec4f(0,0,0,1);
 

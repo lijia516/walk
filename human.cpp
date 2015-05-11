@@ -190,6 +190,30 @@ void Human::draw()
 	static GLfloat lmodel_ambient[] = {0.4,0.4,0.4,1.0};
     
     
+    
+    glPushMatrix();
+    glTranslated(0, 4, 0);
+    drawSphere(0.2);
+    glPopMatrix();
+    
+
+    
+    glPushMatrix();
+    glTranslated(1.47049,3.65,-0.6);
+    drawSphere(0.2);
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslated(1.47049,1.97,-0.6);
+    drawSphere(0.2);
+    glPopMatrix();
+    
+    glPushMatrix();
+    glTranslated(-0.424584,3.53541,-0.393704);
+    drawSphere(0.2);
+    glPopMatrix();
+
+    
 
 	// define the model
 
@@ -197,13 +221,18 @@ void Human::draw()
     
     glRotatef( twist, 1, 1, 1 );
 
-    glTranslatef( 0, 2.45, 0 );
+    glTranslatef( 5, 2.45, 0 );
+    
+    ParticleSystem::offset = 5;
     
     glPushMatrix();
     
         glTranslatef( 0.0, thigh_exlen, 0.0 );
-        glTranslatef( 0.0, 0.0, pelvis_exz );
+    
+    
         glRotatef(pelvis_r, 0.0, 1.0, 0.0 );
+        glTranslatef( 0.0, 0.0, pelvis_exz );
+    
         pelvis(1);
     
         Mat4f particleXformPel = matCamInverse * glGetMatrix(GL_MODELVIEW_MATRIX);
