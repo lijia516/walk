@@ -82,8 +82,6 @@ public:
     
     std::vector<body*> mBodys;
     std::vector<leg*> mLegs;
-    
-
 };
 
 #endif // IK_H_INCLUDED

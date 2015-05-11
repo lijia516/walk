@@ -109,7 +109,7 @@ void volcano()
 
 
 	setDiffuseColor( 139/255.0, 69/255.0,19/255.0);
-	setAmbientColor( 1, 1, 1);
+	setAmbientColor( 0.7, 0.3, 0.05);
 	setSpecularColor(0,0,0);
 
 		glPushMatrix();
@@ -190,6 +190,7 @@ void Human::draw()
     float twist = VAL(TWIST);
 	float rope = VAL(ROPE);
     
+	ParticleSystem *ps = ModelerApplication::Instance()->GetParticleSystem();
 
     // This call takes care of a lot of the nasty projection 
     // matrix stuff
@@ -207,17 +208,17 @@ void Human::draw()
 	static GLfloat lmodel_ambient[] = {0.4,0.4,0.4,1.0};
     
     //draw volcano
+	setLightPosition(-1,1,0,0);
+	setEmissionColor(0.0,0.0,0.0);
 	volcano();
 
 	//rope
-	setDiffuseColor( 0.3, 0.5, 0.2 );
-	setAmbientColor( 0.4, 0.4, 0.4 );
-	setSpecularColor(0,0,0);
 	glPushMatrix();
 	glTranslatef(ropeStart[0], ropeStart[1], ropeStart[2]);
 
 	setDiffuseColor( 139/255.0, 69/255.0,19/255.0);
-	setAmbientColor( 1, 1, 1);
+	setAmbientColor( 0.7, 0.3, 0.05 );
+	//setAmbientColor( 1, 1, 1);
 	setSpecularColor(0,0,0);
 
 	glRotatef(135,0,1,0);
@@ -231,15 +232,25 @@ void Human::draw()
 	glTranslatef(0,0,rope);
 
 	glPushMatrix();
-	setDiffuseColor( 1.0, 0.3, 0.0 );
+
+	if(ps->start_erruption){
+	setDiffuseColor( 1.0, 0.5, 0.0 );
 	setAmbientColor( 1.0, 1.0, 1.0 );
-	setSpecularColor(1.0,0.3,0);
+	setSpecularColor(1.0,0.4,0);
+	setEmissionColor(1.0,0.4,0.05);
+	}else{
+	setDiffuseColor( 0.0, 0.0, 0.0 );
+	setAmbientColor( 1.0, 1.0, 1.0 );
+	setSpecularColor(0.0,0.0,0);
+	setEmissionColor(0.0,0.,0.0);
+	}
 	glScalef(0.3,0.3,0.3);
 	y_box(0.25);
 	glPopMatrix();
 
 	glPopMatrix();
 
+	setEmissionColor(0.0,0.,0.0);
 	
     glPushMatrix();
     glTranslated(0, 0, 0);
@@ -468,10 +479,6 @@ void Human::draw()
     
     glPopMatrix();
     
-    
-
-    
-		ParticleSystem *ps = ModelerApplication::Instance()->GetParticleSystem();
 		ps->ss.draw_fluid();
     
   //  std::cout<<"ori:" << ParticleSystem::particleOrigin[0] << "," << ParticleSystem::particleOrigin[1] << "," << ParticleSystem::particleOrigin[2] << std::endl;
@@ -828,6 +835,7 @@ int main()
 
 	ParticleSystem *ps = new ParticleSystem();
     ModelerApplication::Instance()->SetParticleSystem(ps);
+	ps->start_erruption= false;
     
     
     ModelerApplication::Instance()->Init(&createHuman, controls, NUMCONTROLS);

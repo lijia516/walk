@@ -55,10 +55,13 @@ private:
 // ****************************************************************************
 
 // Set the current material properties
+void setLightPosition(float x, float y, float z, float index);
+void setEmissionColor(float r, float g, float b);
 void setAmbientColor(float r, float g, float b);
 void setDiffuseColor(float r, float g, float b);
 void setSpecularColor(float r, float g, float b);
 void setShininess(float s);
+void setDiffuseColor(float r, float g, float b, float index);
 
 // Set the current draw mode (see DrawModeSetting_t for valid values
 void setDrawMode(DrawModeSetting_t drawMode);

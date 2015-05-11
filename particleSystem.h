@@ -53,7 +53,6 @@ class ExplosionSystem{
 						N = size;
 
 						for (int i = 0; i < N; i++) {
-
 								Particle p;
 								p.color = Vec3f(1.0,1.0,1.0);
 								emitters.push_back(p);
@@ -73,13 +72,14 @@ class FluidSystem{
 				double * u, * v, * u0, * v0;
 				double * w, * w0;
 				double * dens, * dens0;
-				int iteration_count = 10;
+				int iteration_count = 15;
 				Vec3f position;
 				FluidSystem(int size, Vec3f position){
 						int _size=(size+2)*(size+2)*(size+2);
 						int i,j,k;
 						N = size;
 						this->position = position;
+
 						//default
 						dt = 0.1f;
 						diff = 0.05f;
@@ -96,11 +96,11 @@ class FluidSystem{
 								w[i] = w0[i] = u[i] = v[i] = u0[i] = v0[i] = dens[i] = dens0[i] = 0.0f;
 								v[i] = 0.05;
 						}
-						float inner = 100.0f;
-						float inner14 = 70.0f;
+						float inner = 10.0f;
+						float inner14 = 7.0f;
 						//default moving up
 						v[IX(N/2,1,N/2)] = 10.0f;
-						dens[IX(N/2,1,N/2)] = 400.0f;
+						dens[IX(N/2,1,N/2)] = 50.0f;
 						//presure
 						u[IX(N/2-1,1,N/2)] = inner;
 						u[IX(N/2-1,1,N/2-1)] = inner14;
@@ -134,6 +134,7 @@ class FluidSystem{
 				void advect(int N, double *d, double *d0, double *u, double *v, double *w, double dt);
 				void dens_step(int N, double *d, double *d0, double *u, double *v, double *w, double dif, double dt);
 				void vel_step(int N, double *u, double *v, double *w, double *u0, double *v0, double *w0, double vis, double dt);
+				float gradient_to_velocity(float neg, float pos);
 };
 
 class ParticleSystem {
@@ -145,7 +146,8 @@ class ParticleSystem {
 
 				/** Destructor **/
 				virtual ~ParticleSystem();
-				FluidSystem ss = FluidSystem(60,Vec3f(-4,4,4));
+				bool start_erruption;
+				FluidSystem ss = FluidSystem(50,Vec3f(-4,4,4));
 				ExplosionSystem es = ExplosionSystem(10);
 
 				/** Simulation fxns **/

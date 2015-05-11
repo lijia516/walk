@@ -78,6 +78,16 @@ ModelerDrawState* ModelerDrawState::Instance()
 // ****************************************************************************
 // Set the current material properties
 
+void setLightPosition(float x, float y, float z, float index){
+		GLfloat lightpos[] = {x, y, z, index};
+		glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
+}
+
+void setEmissionColor(float r, float g, float b)
+{	
+		GLfloat rgb[] = {r, g, b, 1.0};
+		glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, rgb);
+}
 void setAmbientColor(float r, float g, float b)
 {
     ModelerDrawState *mds = ModelerDrawState::Instance();
@@ -91,6 +101,11 @@ void setAmbientColor(float r, float g, float b)
         glMaterialfv( GL_FRONT_AND_BACK, GL_AMBIENT, mds->m_ambientColor);
 }
 
+void setDiffuseColor(float r, float g, float b, float index)
+{
+		GLfloat rgb[] = {r, g, b, index};
+        glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE, rgb);
+}
 void setDiffuseColor(float r, float g, float b)
 {
     ModelerDrawState *mds = ModelerDrawState::Instance();
