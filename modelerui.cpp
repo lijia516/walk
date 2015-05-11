@@ -411,15 +411,15 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
         
        // body* lt = new body(thigh_len/2 * 3 * 2 + shin_len/2 * 3.5 * 2 + .02 * 3 + 2, 3.14f/10, 0);
        
-        body* lt = new body(1 + 1.3, 3.14f/10, 0);
-        myik->mBodys.push_back(lt);
+        leg* lt = new leg(1 + 1.3, 3.14f/10);
+        myik->mLegs.push_back(lt);
         
        // body* lshin = new body(1.3, -3.14f/10, 0);
        // myik->mBodys.push_back(ls);
         
         
-        body* rt = new body(1 + 1.3 , 3.14f/10, 0);
-        myik->mBodys.push_back(rt);
+        leg* rt = new leg(1 + 1.3 , 3.14f/10);
+        myik->mLegs.push_back(rt);
         
       //  body* rshin = new body(1.3, 3.14f/10, 0);
       //  myik->mBodys.push_back(rshin);
@@ -452,7 +452,6 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
         myik->mRFootPosition(0) = ParticleSystem::footPosition[0] - 0.6;
         myik->mRFootPosition(1) = myik->mPelPostion(1) - 2.3 * cos(0.314);
         myik->mRFootPosition(2) = myik->mPelPostion(2) - 2.3 * sin(0.314);
-        
         
         myik->start();
         

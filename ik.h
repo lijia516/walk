@@ -22,6 +22,19 @@ public:
 };
 
 
+class leg
+{
+    
+public:
+    leg(){ mLen = 0; mAngle = 0;};
+    leg(float len, float angle_x){mLen = len; mAngle = angle_x;};
+    
+    float mLen;
+    float mAngle;
+    
+};
+
+
 class IK
 {
 public:
@@ -66,6 +79,7 @@ public:
     float dp(float p1, float p2);
     
     std::vector<body*> mBodys;
+    std::vector<leg*> mLegs;
     
 
 };

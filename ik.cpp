@@ -458,20 +458,11 @@ void IK::walk(ModelerApplication* app) {
         
         VectorXf dydz = VectorXf::Zero(2, 1);
         
-        if (dt < 2) {
-        
-        dydz(0) = 0.3;
-        dydz(1) = 0.2;
-            
-        } else {
-            
-            dydz(0) = 0.393179;
-            dydz(1) = -1.02931;
-            
-        }
+        dydz(0) = 0.457836 - mFootPosition(1) - 0.15;
+        dydz(1) = -1.15 - mFootPosition(2);
         
         walk_calculateAngles(dydz, 0, "l");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mBodys[2]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mLegs[0]->mAngle * 180.0 / PI);
         
         std::cout << "finish left forward. \n";
         
@@ -480,14 +471,14 @@ void IK::walk(ModelerApplication* app) {
         
         // right keep
         
-        float dp_y = mFootPosition(1);
-        float dp_z = mFootPosition(2) - mPelPostion(2);
+        float dp_y = mFootPosition(1) - 0.15;
+        float dp_z = mFootPosition(2) - 0;
         
-        dydz(0) = -(mFootPosition(1)) ;
-        dydz(1) = -(mFootPosition(2) - mPelPostion(2));
+        dydz(0) = -(mFootPosition(1) - 0.15) ;
+        dydz(1) = -(mFootPosition(2) - 0);
         
         walk_calculateAngles(dydz, 0, "r");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mBodys[3]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mLegs[1]->mAngle * 180.0 / PI);
         
         std::cout << "finish right keep. \n";
         
@@ -500,7 +491,7 @@ void IK::walk(ModelerApplication* app) {
         // left foot back
 
         walk_calculateAngles(dydz, 0, "l");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mBodys[2]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mLegs[0]->mAngle * 180.0 / PI);
         
        
         
@@ -515,41 +506,42 @@ void IK::walk(ModelerApplication* app) {
 
         
         walk_calculateAngles(dydz, 0, "r");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mBodys[3]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mLegs[1]->mAngle * 180.0 / PI);
         
         
         std::cout << "finish right forward. \n";
         
         mPelPostion(2) += temp;
-        mRFootPosition(2) += temp;
-        mFootPosition(2) += temp;
         
         std::cout << "finish pel update"<< mPelPostion(2) << "\n";
         
       
+      
         dt += 0.5;
         
         // right forward
-        dydz(0) = 0.393179;
-        dydz(1) = -1.02931;
+        dydz(0) = 0.457836 - mRFootPosition(1);
+        dydz(1) = -1.15 - mRFootPosition(2);
         
         walk_calculateAngles(dydz, 0, "r");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mBodys[3]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mLegs[1]->mAngle * 180.0 / PI);
         
         
          std::cout << "finish right forward 2. \n";
        
+        
+        
         dt += 1;
         
         // left keep
-        dp_y = mRFootPosition(1);
-        dp_z = mRFootPosition(2) - mPelPostion(2);
+        dp_y = mRFootPosition(1) - 0.15;
+        dp_z = mRFootPosition(2);
         
-        dydz(0) = -(mRFootPosition(1));
-        dydz(1) = -(mRFootPosition(2) - mPelPostion(2));
+        dydz(0) = -(mRFootPosition(1) - 0.15);
+        dydz(1) = -(mRFootPosition(2));
         
         walk_calculateAngles(dydz, 0, "l");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mBodys[2]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mLegs[0]->mAngle * 180.0 / PI);
 
         
         std::cout << "finish left keep 2. \n";
@@ -557,18 +549,18 @@ void IK::walk(ModelerApplication* app) {
         
         // pel forward
         
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(43, dt, mRFootPosition(2));
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(43, dt, mPelPostion(2) + mRFootPosition(2));
         temp = mRFootPosition(2);
         
         // right back
         
         walk_calculateAngles(dydz, 0, "r");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mBodys[3]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(4, dt, mLegs[1]->mAngle * 180.0 / PI);
         
         std::cout << "finish right back 2. \n";
         
         
-        
+       
         
         dt += 0.5;
         // left forward
@@ -579,7 +571,7 @@ void IK::walk(ModelerApplication* app) {
          std::cout << "dydz(1): " << dydz(1) <<"\n";
         
         walk_calculateAngles(dydz, 0, "l");
-        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mBodys[2]->mAngles[0] * 180.0 / PI);
+        app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mLegs[0]->mAngle * 180.0 / PI);
         
         std::cout << "finish left forward 2. \n";
         
@@ -587,7 +579,7 @@ void IK::walk(ModelerApplication* app) {
         
         std::cout << "mple "<< mPelPostion(2) <<"\n";
        
-    
+     /**/
         
     }
     
@@ -597,41 +589,35 @@ void IK::walk(ModelerApplication* app) {
 MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
     
     
-    MatrixXf walk_jacobianMatrx = MatrixXf::Zero(2, mBodys.size());
+    MatrixXf walk_jacobianMatrx = MatrixXf::Zero(2, mLegs.size() - 1);
     
     int start = 0;
     int end = 0;
     
     if (lr.compare("l") == 0) {
-        start = 2;
+        start = 0;
         end = 1;
     } else {
         
-        start = 3;
-        end = 0;
+        start = 1;
+        end = 2;
         
     }
     
   //  std::cout <<"mBodys.size(): " << mBodys.size()<< "\n";
     
-    for (int j = start; j < mBodys.size() - end; j++) {
+    for (int j = start; j < end; j++) {
         
         float angle_x = 0;
         
-         for (int i = start; i < mBodys.size() - end; i++) {
+         for (int i = start; i < end; i++) {
             
-            angle_x += mBodys[i]->mAngles[0];
-             
+            angle_x += mLegs[i]->mAngle;
            
             if (i >= j) {
-                
-             //   std::cout <<"i: " << i<< "\n";
-                walk_jacobianMatrx(0, j - start) += (float)(mBodys[i]->mLen * sin(angle_x));
-                walk_jacobianMatrx(1, j - start) += (float)(-mBodys[i]->mLen * cos(angle_x));
-                
-            //    std::cout <<"mBodys[i]->mLen:" <<mBodys[i]->mLen<<"\n";
-            //    std::cout <<"angle_x:" <<mBodys[i]->mAngles[0] <<"\n";
-            //    std::cout <<"walk_jacobianMatrx:" <<walk_jacobianMatrx <<"\n";
+                walk_jacobianMatrx(0, j - start) += (float)(mLegs[i]->mLen * sin(angle_x));
+                walk_jacobianMatrx(1, j - start) += (float)(-mLegs[i]->mLen * cos(angle_x));
+        
             }
         }
     }
@@ -647,7 +633,13 @@ MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
     float m11 = roundf(jacobianMatrxInverse1(1,1) * 1000000) / 1000000.0;
     
     
-    Matrix2f walk_jacobianMatrxInverse;
+    MatrixXf walk_jacobianMatrxInverse;
+    Matrix3d test;
+    
+    test << 1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 2.0, 3.0;
+    test.inverse();
+    
+   // cout << test.inverse();
     
     walk_jacobianMatrxInverse << m00, m01, m10, m11;
    
@@ -660,67 +652,59 @@ MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
 
 void IK::walk_calculateAngles(VectorXf dydz, float angle, std::string lr) {
     
-    VectorXf walk_dAngles = VectorXf::Zero(mBodys.size(), 1);
-    
-  
+    VectorXf walk_dAngles = VectorXf::Zero(mLegs.size() - 1, 1);
     walk_dAngles = walk_jacobianInverse(angle, lr) * dydz;
     
-    
-    
-  //  std::cout <<"walk_jacobianInverse():" <<  walk_jacobianInverse(angle, lr) << "\n";
-  //  std::cout <<"walk_dAngles:" <<  walk_dAngles << "\n";
     
     int start = 0;
     int end = 0;
     
     if (lr.compare("l") == 0) {
-        start = 2;
+        start = 0;
         end = 1;
     } else {
         
-        start = 3;
-        end = 0;
+        start = 1;
+        end = 2;
         
     }
 
     
-    for (int i = start; i < mBodys.size() - end; i++) {
+    for (int i = start; i < end; i++) {
             
-            mBodys[i]->mAngles[0] += walk_dAngles(i - start);
+            mLegs[i]->mAngle += walk_dAngles(i - start);
     }
     
     
-    for (int i = start; i < mBodys.size() - end; i++) {
+    for (int i = start; i < end; i++) {
             
-            while (mBodys[i]->mAngles[0] < -2 * PI) {
+            while (mLegs[i]->mAngle < -2 * PI) {
                 
-                mBodys[i]->mAngles[0] += PI;
+                mLegs[i]->mAngle += (2 * PI);
             }
             
-            while (mBodys[i]->mAngles[0] > 2 * PI) {
+            while (mLegs[i]->mAngle > 2 * PI) {
                 
-                mBodys[i]->mAngles[0] -= PI;
+                mLegs[i]->mAngle -= (2 * PI);
             }
     }
     
     updateFootPosition(angle, lr);
-    
 }
     
     
 void IK :: updateFootPosition(float angle, std::string lr) {
     
-
     int start = 0;
     int end = 0;
     
     if (lr.compare("l") == 0) {
-        start = 2;
+        start = 0;
         end = 1;
     } else {
         
-        start = 3;
-        end = 0;
+        start = 1;
+        end = 2;
         
     }
     
@@ -729,17 +713,15 @@ void IK :: updateFootPosition(float angle, std::string lr) {
     if (lr.compare("l") == 0) {
     
         mFootPosition(0) = mPelPostion(0) + 0.3;
-        
-        
         mFootPosition(1) = mPelPostion(1);
-        mFootPosition(2) = mPelPostion(2);
+        mFootPosition(2) = 0;
         
-        for (int i = start; i < mBodys.size() - end; i++) {
+        for (int i = start; i < end; i++) {
             
-            angle_x += mBodys[i]->mAngles[0];
+            angle_x += mLegs[i]->mAngle;
             
-            mFootPosition(1) -= mBodys[i]->mLen * cos(angle_x);
-            mFootPosition(2) -= mBodys[i]->mLen * sin(angle_x);
+            mFootPosition(1) -= mLegs[i]->mLen * cos(angle_x);
+            mFootPosition(2) -= mLegs[i]->mLen * sin(angle_x);
         }
         
          std::cout << "new mFootPosition: " << lr << ": "<< mFootPosition << "\n";
@@ -747,16 +729,15 @@ void IK :: updateFootPosition(float angle, std::string lr) {
     } else {
         
          mRFootPosition(0) = mPelPostion(0) - 0.3;
-        
          mRFootPosition(1) = mPelPostion(1);
-         mRFootPosition(2) = mPelPostion(2);
+         mRFootPosition(2) = 0;
         
-        for (int i = start; i < mBodys.size() - end; i++) {
+        for (int i = start; i < end; i++) {
             
-            angle_x += mBodys[i]->mAngles[0];
+            angle_x += mLegs[i]->mAngle;
             
-            mRFootPosition(1) -= mBodys[i]->mLen * cos(angle_x);
-            mRFootPosition(2) -= mBodys[i]->mLen * sin(angle_x);
+            mRFootPosition(1) -= mLegs[i]->mLen * cos(angle_x);
+            mRFootPosition(2) -= mLegs[i]->mLen * sin(angle_x);
         }
         
          std::cout << "new mRFootPosition: " << lr << ": "<< mRFootPosition << "\n";
