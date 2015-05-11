@@ -461,7 +461,10 @@ void IK::walk(ModelerApplication* app) {
         dydz(0) = 0.457836 - mFootPosition(1) - 0.15;
         dydz(1) = -1.15 - mFootPosition(2);
         
+        
+        
         walk_calculateAngles(dydz, 0, "l");
+        
         app->GetUI()->m_pwndGraphWidget->AddCtrlPt(1, dt, mLegs[0]->mAngle * 180.0 / PI);
         
         std::cout << "finish left forward. \n";
@@ -589,7 +592,7 @@ void IK::walk(ModelerApplication* app) {
 MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
     
     
-    MatrixXf walk_jacobianMatrx = MatrixXf::Zero(2, mLegs.size() - 1);
+    MatrixXf walk_jacobianMatrx = MatrixXf::Zero(2, mLegs.size());
     
     int start = 0;
     int end = 0;
@@ -603,6 +606,9 @@ MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
         end = 2;
         
     }
+    
+    
+   
     
   //  std::cout <<"mBodys.size(): " << mBodys.size()<< "\n";
     
@@ -622,6 +628,7 @@ MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
         }
     }
     
+   
     
     MatrixXf jacobianMatrxInverse1 = MatrixXf::Zero(2,2);
     jacobianMatrxInverse1 = walk_jacobianMatrx * (walk_jacobianMatrx.transpose());
@@ -633,15 +640,11 @@ MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
     float m11 = roundf(jacobianMatrxInverse1(1,1) * 1000000) / 1000000.0;
     
     
-    MatrixXf walk_jacobianMatrxInverse;
-    Matrix3d test;
-    
-    test << 1.0, 2.0, 3.0, 4.0, 2.0, 3.0, 4.0, 2.0, 3.0;
-    test.inverse();
-    
-   // cout << test.inverse();
+    Matrix2f walk_jacobianMatrxInverse;
+
     
     walk_jacobianMatrxInverse << m00, m01, m10, m11;
+   
    
     
     return walk_jacobianMatrx.transpose() * walk_jacobianMatrxInverse.inverse();
@@ -653,8 +656,13 @@ MatrixXf IK::walk_jacobianInverse(float angle, std::string lr) {
 void IK::walk_calculateAngles(VectorXf dydz, float angle, std::string lr) {
     
     VectorXf walk_dAngles = VectorXf::Zero(mLegs.size() - 1, 1);
+    
+    
+ 
+    
     walk_dAngles = walk_jacobianInverse(angle, lr) * dydz;
     
+  
     
     int start = 0;
     int end = 0;
@@ -688,6 +696,8 @@ void IK::walk_calculateAngles(VectorXf dydz, float angle, std::string lr) {
                 mLegs[i]->mAngle -= (2 * PI);
             }
     }
+    
+    
     
     updateFootPosition(angle, lr);
 }
