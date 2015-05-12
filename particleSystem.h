@@ -72,7 +72,7 @@ class FluidSystem{
 				double * u, * v, * u0, * v0;
 				double * w, * w0;
 				double * dens, * dens0;
-				int iteration_count = 15;
+				int iteration_count = 10;
 				Vec3f position;
 				FluidSystem(int size, Vec3f position){
 						int _size=(size+2)*(size+2)*(size+2);
@@ -83,7 +83,7 @@ class FluidSystem{
 						//default
 						dt = 0.1f;
 						diff = 0.05f;
-						visc = 0.1f;
+						visc = 0.05f;
 						u = (double *) malloc ( _size*sizeof(double) );
 						v = (double *) malloc ( _size*sizeof(double) );
 						w = (double *) malloc ( _size*sizeof(double) );
@@ -147,7 +147,7 @@ class ParticleSystem {
 				/** Destructor **/
 				virtual ~ParticleSystem();
 				bool start_erruption;
-				FluidSystem ss = FluidSystem(50,Vec3f(-4,4,4));
+				FluidSystem ss = FluidSystem(60,Vec3f(-4,4,4));
 				ExplosionSystem es = ExplosionSystem(10);
 
 				/** Simulation fxns **/

@@ -1097,7 +1097,7 @@ void FluidSystem::draw_fluid(void){
 										if(d[t] > 2){
 												setEmissionColor(0.8, 0.2, 0.05);
 												//cout << t << ":" << d[t];
-												opa = 0.99;
+												opa = 0.6;
 										}
 
 								}
@@ -1371,6 +1371,7 @@ float FluidSystem::gradient_to_velocity(float neg, float pos){
 		float dif = (pos - neg)/3.0;
 		return dif;
 }
+
 void FluidSystem::update_fluid(double dt){
 		double *tmp;
 		int i,j,k;
@@ -1381,6 +1382,7 @@ void FluidSystem::update_fluid(double dt){
 		int jittery = rand()%3;
 		int jitterz = -1.0 + rand()%3;
 
+		//add new fuel
 		add_to_array(dens, IX(N/2,1,N/2), 200.0);
 		//add fluid and pressure
 		//add_to_array(dens, IX(N/2+jitterx,1+jittery,N/2+jitterz), 200.0);
@@ -1401,15 +1403,18 @@ void FluidSystem::update_fluid(double dt){
 		   add_to_array(w,IX(N/2+jitterx,1+jittery,N/2+1+jitterz),-inner);;
 		   add_to_array(w,IX(N/2-1+jitterx,1+jittery,N/2+1+jitterz),-inner14);
 		 */
-		//disturbe
+		
+
 		double positive;
 		double negative;
+
+		//compute the pressure gradient
 		FOR_EACH_GRID(N,i,j,k){
-				if(dens[IX(i,j,k)] > 10.0){//heat
+				if(dens[IX(i,j,k)] > 10.0){
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k)], dens[IX(i+1,j,k)]);
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k-1)], dens[IX(i+1,j,k+1)])/1.414;
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k+1)], dens[IX(i+1,j,k-1)])/1.414;
-						v[IX(i,j,k)] += 3.0f;
+						v[IX(i,j,k)] += 3.0f; //heat!
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i,j,k-1)], dens[IX(i,j,k+1)]);
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k-1)], dens[IX(i+1,j,k+1)])/1.414;
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i+1,j,k-1)], dens[IX(i-1,j,k+1)])/1.414;
@@ -1425,9 +1430,10 @@ void FluidSystem::update_fluid(double dt){
 				   negative = rand()/(double)(RAND_MAX+1)/4;
 				   add_to_array(w, IX(i,j,k), positive+negative);
 				 */
-				//decay
+
+				//burning decay
 				if(dens[IX(i,j,k)] > 0.1){
-						dens[IX(i,j,k)] *= 0.985;
+						dens[IX(i,j,k)] *= 0.98;
 				}else
 						dens[IX(i,j,k)] = 0;
 
