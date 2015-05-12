@@ -36,6 +36,7 @@ bool ParticleSystem::pipe = false;
 bool ParticleSystem::pony = false;
 bool ParticleSystem::cloth = false;
 bool ParticleSystem::bounceOff = false;
+float ParticleSystem::start_time = 1000000;
 
 float ParticleSystem::offset = 0;
 
@@ -218,6 +219,9 @@ void ParticleSystem::computeForcesAndUpdateParticles(float t)
 
 		//  std::cout <<"time: " << t << std::endl;
 		// TODO
+    
+    if (t > start_time) {
+    
 		if(t- prevT > 0.03){
 				float deltaT = t - prevT;
 				ss.update_fluid(deltaT);
@@ -226,6 +230,8 @@ void ParticleSystem::computeForcesAndUpdateParticles(float t)
 						printf("(!!) Dropped Frame %lf (!!)\n", t-prevT);
 				prevT = t;
 		}
+        
+    }
 		return;
 
 		if (isSimulate()) {
@@ -1414,7 +1420,7 @@ void FluidSystem::update_fluid(double dt){
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k)], dens[IX(i+1,j,k)]);
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k-1)], dens[IX(i+1,j,k+1)])/1.414;
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k+1)], dens[IX(i+1,j,k-1)])/1.414;
-						v[IX(i,j,k)] += 3.0f; //heat!
+						v[IX(i,j,k)] += 5.0f; //heat!
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i,j,k-1)], dens[IX(i,j,k+1)]);
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k-1)], dens[IX(i+1,j,k+1)])/1.414;
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i+1,j,k-1)], dens[IX(i-1,j,k+1)])/1.414;

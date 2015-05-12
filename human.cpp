@@ -207,6 +207,14 @@ void Human::draw()
 
 	static GLfloat lmodel_ambient[] = {0.4,0.4,0.4,1.0};
     
+    
+    glPushMatrix();
+    glTranslated(-1.38858, 3.97638, 1.34239);
+    drawSphere(0.2);
+    glPopMatrix();
+    
+    
+    
     //draw volcano
 	setLightPosition(-1,1,0,0);
 	setEmissionColor(0.0,0.0,0.0);
@@ -226,7 +234,7 @@ void Human::draw()
 	drawCylinder(1, 0.1, 0.1);
 
 	glTranslatef(0,0,1);
-	glRotatef(56,1,0,0);
+	glRotatef(5,1,0,0);
 	drawCylinder(rope, 0.1, 0.1);
 
 	glTranslatef(0,0,rope);
@@ -252,40 +260,6 @@ void Human::draw()
 
 	setEmissionColor(0.0,0.,0.0);
 	
-    glPushMatrix();
-    glTranslated(0, 0, 0);
-    drawSphere(0.5);
-    glPopMatrix();
-    
-    
-    glPushMatrix();
-    glTranslated(-1, 4, 0);
-    drawSphere(0.1);
-    glPopMatrix();
-    
-    
-    glPushMatrix();
-    glTranslated(0, 4, 0);
-    drawSphere(0.2);
-    glPopMatrix();
-    
-
-    
-    glPushMatrix();
-    glTranslated(1.47049,3.65,-0.6);
-    drawSphere(0.2);
-    glPopMatrix();
-    
-    glPushMatrix();
-    glTranslated(1.47049,1.97,-0.6);
-    drawSphere(0.2);
-    glPopMatrix();
-    
-    glPushMatrix();
-    glTranslated(-0.424584,3.53541,-0.393704);
-    drawSphere(0.2);
-    glPopMatrix();
-
     
 
 	// define the model
@@ -826,7 +800,7 @@ int main()
     controls[PARTICLE_COUNT] = ModelerControl("particle count (pc)", 0.0, 5.0, 0.1, 5.0 );
     
     controls[TWIST] = ModelerControl("human twist", -360, 360, 0.1, 0 );
-    controls[ROPE] = ModelerControl("ROPE", 0, 5, 0.1, 2);
+    controls[ROPE] = ModelerControl("ROPE", 0, 5, 0.1, 2.5);
     
 
 	// You should create a ParticleSystem object ps here and then

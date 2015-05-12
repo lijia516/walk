@@ -1,7 +1,6 @@
 #ifndef IK_H_INCLUDED
 #define IK_H_INCLUDED
 
-#undef Success
 #include "curveevaluator.h"
 #include "modelerapp.h"
 #include "Eigen/Dense"
@@ -73,15 +72,19 @@ public:
     bool getGoal();
     float rotateBody();
     void updateHeadDir(float angle);
-    void updateArmPosition();
-    void updateCurPosition(float anlge);
+    void updateArmPosition(Vector3f headDirction_var, Vector3f mPelPostion_var);
+    void updateCurPosition(float anlge, Vector3f mArmStartPostion_var);
     void updateFootPosition(float anlge, std::string lr);
-    void updateCurPositionInitial();
-    void walk(ModelerApplication* app);
+    void updateCurPositionInitial(Vector3f mArmStartPostion_var);
+    float walk(ModelerApplication* app);
     float dp(float p1, float p2);
+    bool isNearGoal(Vector3f headDirction_var, Vector3f mPelPostion_var);
+    
     
     std::vector<body*> mBodys;
     std::vector<leg*> mLegs;
+    
+
 };
 
 #endif // IK_H_INCLUDED

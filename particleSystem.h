@@ -147,8 +147,8 @@ class ParticleSystem {
 				/** Destructor **/
 				virtual ~ParticleSystem();
 				bool start_erruption;
-				FluidSystem ss = FluidSystem(60,Vec3f(-4,4,4));
-				ExplosionSystem es = ExplosionSystem(10);
+				FluidSystem ss = FluidSystem(100,Vec3f(-4,4,4));
+				ExplosionSystem es = ExplosionSystem(30);
 
 				/** Simulation fxns **/
 				// This fxn should render all particles in the system,
@@ -200,6 +200,9 @@ class ParticleSystem {
 				static bool pony;
 				static bool cloth;
 				static bool bounceOff;
+    
+                static float start_time;
+    
 				static Vec4f cloth_start;
 				static Vec4f cloth_end;
 				static Vec4f pelvisPosition;

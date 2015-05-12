@@ -418,16 +418,16 @@ inline void ModelerUI::cb_addNewPt_i(Fl_Light_Button*, void*)
        // myik->mBodys.push_back(ls);
         
         
-        leg* rt = new leg(1 + 1.3 , 3.14f/10);
+        leg* rt = new leg(1 + 1.3, 3.14f/10);
         myik->mLegs.push_back(rt);
         
       //  body* rshin = new body(1.3, 3.14f/10, 0);
       //  myik->mBodys.push_back(rshin);
         
         
-        myik->mGoalPostion(0) = 0;
-        myik->mGoalPostion(1) = 4;
-        myik->mGoalPostion(2) = 0;
+        myik->mGoalPostion(0) = -1.38858;
+        myik->mGoalPostion(1) = 3.97638;
+        myik->mGoalPostion(2) = 1.34239;
         
         myik->mCurPosition(0) = ParticleSystem::particleOrigin_pony[0];
         myik->mCurPosition(1) = ParticleSystem::particleOrigin_pony[1];
