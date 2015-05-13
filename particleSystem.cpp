@@ -36,7 +36,7 @@ bool ParticleSystem::pipe = false;
 bool ParticleSystem::pony = false;
 bool ParticleSystem::cloth = false;
 bool ParticleSystem::bounceOff = false;
-float ParticleSystem::start_time = 1000000;
+float ParticleSystem::start_time = 1300000;
 
 float ParticleSystem::offset = 0;
 
@@ -220,12 +220,14 @@ void ParticleSystem::computeForcesAndUpdateParticles(float t)
 		//  std::cout <<"time: " << t << std::endl;
 		// TODO
     
-    if (t > start_time) {
-    
+  //  if (t > start_time) {
+    if (t > 12.5) {
+		// std::cout <<"time: " << t << std::endl;
 		if(t- prevT > 0.03){
 				float deltaT = t - prevT;
 				ss.update_fluid(deltaT);
-				es.update(deltaT);
+    			if (t > 12.8)
+					es.update(deltaT);
 				if( t - prevT > .04 )
 						printf("(!!) Dropped Frame %lf (!!)\n", t-prevT);
 				prevT = t;
@@ -1069,11 +1071,12 @@ void FluidSystem::draw_fluid(void){
 		double x, y , z, h;
 		double d[8];
 
-		h = 5.0f/N;
+		h = 10.0f/N;
 		//	glDisable(GL_LIGHTING);
 		glPushMatrix();
 
-		glTranslatef(position[0] - 7.5,position[1]-0.5 -5.0/2, position[2] - 2.5);
+//		glTranslatef(position[0] - 7.5,position[1]-0.5 -5.0/2, position[2] - 2.5);
+		glTranslatef(position[0] - 9.85,position[1] - 3, position[2] - 5.15);
 		//	cout<< position<<endl;
 		glBegin ( GL_QUADS );
 
@@ -1382,14 +1385,9 @@ void FluidSystem::update_fluid(double dt){
 		double *tmp;
 		int i,j,k;
 
-		float inner = 10.0f;
-		float inner14 = 7.0f;
-		int jitterx = -1.0 + rand()%3;
-		int jittery = rand()%3;
-		int jitterz = -1.0 + rand()%3;
 
 		//add new fuel
-		add_to_array(dens, IX(N/2,1,N/2), 200.0);
+		add_to_array(dens, IX(N/2,1,N/2), 120.0);
 		//add fluid and pressure
 		//add_to_array(dens, IX(N/2+jitterx,1+jittery,N/2+jitterz), 200.0);
 		/*
@@ -1420,7 +1418,7 @@ void FluidSystem::update_fluid(double dt){
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k)], dens[IX(i+1,j,k)]);
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k-1)], dens[IX(i+1,j,k+1)])/1.414;
 						u[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k+1)], dens[IX(i+1,j,k-1)])/1.414;
-						v[IX(i,j,k)] += 5.0f; //heat!
+						v[IX(i,j,k)] += 3.0f; //going upward
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i,j,k-1)], dens[IX(i,j,k+1)]);
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i-1,j,k-1)], dens[IX(i+1,j,k+1)])/1.414;
 						w[IX(i,j,k)] += gradient_to_velocity(dens[IX(i+1,j,k-1)], dens[IX(i-1,j,k+1)])/1.414;
@@ -1439,7 +1437,7 @@ void FluidSystem::update_fluid(double dt){
 
 				//burning decay
 				if(dens[IX(i,j,k)] > 0.1){
-						dens[IX(i,j,k)] *= 0.98;
+						dens[IX(i,j,k)] *= 0.97;
 				}else
 						dens[IX(i,j,k)] = 0;
 
@@ -1519,9 +1517,9 @@ void ExplosionSystem::explode(Vec3f position){
 		for(std::vector<Particle>::iterator it = emitters.begin(); it != emitters.end();it++){
 				(*it).life = 4 + 2 * (rand() /(double)RAND_MAX);
 				(*it).position = position;
-				float x_r = -1 + 2 * (rand()/(double)RAND_MAX);
+				float x_r = -2 + 4 * (rand()/(double)RAND_MAX);
 				float y_r = 2 + (rand()/(double)RAND_MAX);
-				float z_r = -1 + 2 *( rand()/(double)RAND_MAX);
+				float z_r = -2 + 4 *( rand()/(double)RAND_MAX);
 				(*it).velocity = Vec3f(x_r, y_r ,z_r);
 				//	cout<< "V"<<(*it).velocity << endl;
 		}
@@ -1634,14 +1632,14 @@ void ExplosionSystem::draw(){
 				glTranslatef( (*it).position[0], (*it).position[1], (*it).position[2]);
 				//glColor4f((*it).life,(*it).life,(*it).life,(*it).life);
 				//glColor4f((*it).life,0,0,(*it).life);
-			setLightPosition(-4,4,4, 1);
-				setDiffuseColor((*it).life,(*it).life, (*it).life,(*it).life);
-				setAmbientColor(0.7,0.2,0.0);
-				setSpecularColor(0.2,0.0,0.0);
+				setLightPosition(-1,0,0, 0);
+				setDiffuseColor((*it).life,(*it).life, (*it).life,1.0);
+				setAmbientColor(0.7,0.4,0.0);
+				setSpecularColor(0.0,0.0,0.0);
 				setEmissionColor(0,0,0);
 
 
-				float size = 0.2*(1.1-(*it).life);
+				float size = 0.1*(1.1-(*it).life);
 				glScalef(size,size,size);
 				glBegin( GL_QUADS );
 				glNormal3d( 1.0 ,0.0, 0.0);			// +x side

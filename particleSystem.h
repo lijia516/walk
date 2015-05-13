@@ -148,7 +148,7 @@ class ParticleSystem {
 				virtual ~ParticleSystem();
 				bool start_erruption;
 				FluidSystem ss = FluidSystem(100,Vec3f(-4,4,4));
-				ExplosionSystem es = ExplosionSystem(30);
+				ExplosionSystem es = ExplosionSystem(50);
 
 				/** Simulation fxns **/
 				// This fxn should render all particles in the system,

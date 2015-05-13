@@ -1016,11 +1016,11 @@ m_bSaveMovie(false)
 
 	m_poutTime->value("0.00");
 	m_poutPlayStart->value("0.00");
-	m_poutPlayEnd->value("20.00");
+	m_poutPlayEnd->value("60.00");
 
 	m_pbtRemoveAllCamKeyFrames->deactivate();
 
-	endTime(20.0f);
+	endTime(60.0f);
 }
 
 void ModelerUI::show() 

@@ -11,6 +11,8 @@
 #include "modelerdraw.h"
 #include "particleSystem.h"
 #include "ik.h"
+#include "modelerapp.h"	// needed to read values from graph widget
+#include "modelerui.h"	// needed to read values from graph widget
 
 #include <math.h>
 #include "mat.h"
@@ -207,12 +209,12 @@ void Human::draw()
 
 	static GLfloat lmodel_ambient[] = {0.4,0.4,0.4,1.0};
     
-    
+	if(rope >= 2.4){
     glPushMatrix();
     glTranslated(-1.38858, 3.97638, 1.34239);
     drawSphere(0.2);
     glPopMatrix();
-    
+	}
     
     
     //draw volcano
@@ -222,6 +224,7 @@ void Human::draw()
 
 	//rope
 	glPushMatrix();
+	if(rope > 0.1){
 	glTranslatef(ropeStart[0], ropeStart[1], ropeStart[2]);
 
 	setDiffuseColor( 139/255.0, 69/255.0,19/255.0);
@@ -238,27 +241,39 @@ void Human::draw()
 	drawCylinder(rope, 0.1, 0.1);
 
 	glTranslatef(0,0,rope);
-
+	}
 	glPushMatrix();
 
-	if(ps->start_erruption){
+	if(rope < 2.5 && rope > 0.0){
 	setDiffuseColor( 1.0, 0.5, 0.0 );
 	setAmbientColor( 1.0, 1.0, 1.0 );
 	setSpecularColor(1.0,0.4,0);
 	setEmissionColor(1.0,0.4,0.05);
+	glScalef(0.3,0.3,0.3);
+	y_box(0.25);
+	}else if(rope <= 0.01){
+	setDiffuseColor( 0.0, 0.0, 0.0 );
+	setAmbientColor( 1.0, 1.0, 1.0 );
+	setSpecularColor(0.0,0.0,0);
+	setEmissionColor(0.0,0.,0.0);
+	glScalef(0.3,0.3,0.3);
+	y_box(0.25);
 	}else{
 	setDiffuseColor( 0.0, 0.0, 0.0 );
 	setAmbientColor( 1.0, 1.0, 1.0 );
 	setSpecularColor(0.0,0.0,0);
 	setEmissionColor(0.0,0.,0.0);
-	}
 	glScalef(0.3,0.3,0.3);
 	y_box(0.25);
+	}
 	glPopMatrix();
 
 	glPopMatrix();
 
 	setEmissionColor(0.0,0.,0.0);
+	setAmbientColor( 1.0, 1.0, 1.0 );
+	setEmissionColor(0.0,0.,0.0);
+	setSpecularColor(0.0,0.0,0);
 	
     
 
@@ -466,7 +481,7 @@ void ground(float h)
 	glDisable(GL_LIGHTING);
 	glColor3f(0.65,0.45,0.2);
 	glPushMatrix();
-	glScalef(30,0,30);
+	glScalef(60,0,600);
 	y_box(h);
 	glPopMatrix();
 	glEnable(GL_LIGHTING);
@@ -813,5 +828,13 @@ int main()
     
     
     ModelerApplication::Instance()->Init(&createHuman, controls, NUMCONTROLS);
+
+	//script
+
+    ModelerApplication::Instance()->GetUI()->m_pwndGraphWidget->ClearAllCtrlPt(ROPE);
+    ModelerApplication::Instance()->GetUI()->m_pwndGraphWidget->AddCtrlPt(ROPE, 0, 2.5);
+    ModelerApplication::Instance()->GetUI()->m_pwndGraphWidget->AddCtrlPt(ROPE, 11, 2.5);
+    ModelerApplication::Instance()->GetUI()->m_pwndGraphWidget->AddCtrlPt(ROPE, 12.5, 0.0);
+
     return ModelerApplication::Instance()->Run();
 }
